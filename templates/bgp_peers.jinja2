@@ -1,0 +1,6 @@
+ network {{ network }} mask {{ local_netmask }}
+ neighbor {{ remote_ip }} remote-as {{ remote_as }}
+ neighbor {{ remote_ip }} update-source Vlan{{ vlan_id }}
+ neighbor {{ remote_ip }} fall-over bfd
+ neighbor {{ remote_ip }} activate
+ neighbor {{ remote_ip }} default-originate

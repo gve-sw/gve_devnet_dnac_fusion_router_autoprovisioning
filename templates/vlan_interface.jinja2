@@ -1,0 +1,7 @@
+interface Vlan{{ vlan_id }}
+ description {{ vrf_name }}
+ vrf forwarding {{ vrf_name }}
+ ip address {{ local_ip }} {{ local_netmask }}
+ no ip redirects
+ ip route-cache same-interface
+ bfd interval 300 min_rx 300 multiplier 3

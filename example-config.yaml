@@ -1,0 +1,33 @@
+# List border node hostnames to pull configuration from
+border_nodes:
+ - Router01
+ - Router02
+ - Router03
+
+# Specify fusion router hostname to provision
+fusion_router:
+ - FusionRouter01
+
+# Define VRFs to provision on fusion router
+vrfs:
+  # Each node is the VRF name
+  RED:
+    # Set VRF RD
+    rd: 1:100
+    # Specify VLAN interfaces to add to this VRF 
+    vlans:
+     - 1001
+     - 1003
+    # Specify route targets to import
+    import: 
+     - 1:200
+     - 1:500
+  # Example 2:
+  BLUE:
+    rd: 1:200
+    vlans:
+     - 1000
+     - 1002
+    import: 
+     - 1:100
+     - 1:500

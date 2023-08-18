@@ -1,0 +1,8 @@
+router bgp {{ local_as }}
+bgp log-neighbor-changes
+bgp graceful-restart
+!{% for vrf in bgp_vrfs %}
+address-family ipv4 vrf {{ vrf }}
+{% for config in bgp_vrfs[vrf] %}{{ config }}
+{% endfor %}!
+{% endfor %}

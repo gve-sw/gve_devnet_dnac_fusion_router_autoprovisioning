@@ -1,0 +1,7 @@
+vrf definition {{ vrf_name }}
+ rd {{ rd }}
+ address-family ipv4
+  route-target export {{ rd }}
+  route-target import {{ rd }}
+  {% for rt in import_rt %}route-target import {{ rt }}
+  {% endfor %}
