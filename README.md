@@ -74,8 +74,7 @@ border_nodes:
  - Router03
 
 # Specify fusion router hostname to provision
-fusion_router:
- - FusionRouter01
+fusion_router: FusionRouter01
 
 # Define VRFs to provision on fusion router
 vrfs:

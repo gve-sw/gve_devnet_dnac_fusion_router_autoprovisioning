@@ -13,22 +13,31 @@ or implied.
 """
 import os
 import re
+import sys
+from ipaddress import IPv4Network
 from time import sleep
 
 import yaml
 from dnacentersdk import api
 from dnacentersdk.exceptions import ApiError
-from ipaddress import IPv4Network
 from dotenv import load_dotenv
+from jinja2 import Environment, FileSystemLoader
 from rich import print
-import sys
+from rich.console import Console
 from rich.panel import Panel
 from rich.progress import track
-from rich.console import Console
 from rich.prompt import Confirm
-from jinja2 import Environment, FileSystemLoader
+from schema import Schema, SchemaError
 
 console = Console()
+
+config_schema = Schema(
+    {
+        "border_nodes": [str],
+        "fusion_router": str,
+        "vrfs": {str: {"rd": str, "vlans": [int], "import": [str]}},
+    }
+)
 
 
 # Load environment variables
@@ -42,7 +51,13 @@ DNAC_HOST = os.getenv("DNAC_HOST")
 DNAC_USER = os.getenv("DNAC_USER")
 DNAC_PASSWORD = os.getenv("DNAC_PASSWORD")
 DNAC_PROJECT_NAME = os.getenv("DNAC_PROJECT_NAME")
-DNAC_TEMPLATE_NAME = os.getenv("DNAC_TEMPLATE_NAME")
+DNAC_TEMPLATE_NAME = os.getenv("DNAC_TEMPLATE_NAME", "fusion_router_config")
+
+# Validate environment variables are provided
+if any(x is None for x in [DNAC_HOST, DNAC_USER, DNAC_PASSWORD, DNAC_PROJECT_NAME]):
+    print("[red]Required environment variables not found.")
+    print("Please configure: DNAC_HOST, DNAC_USER, DNAC_PASSWORD, DNAC_PROJECT_NAME")
+    sys.exit(1)
 
 global config
 
@@ -222,7 +237,13 @@ def loadConfig() -> None:
     with open("./config.yaml", "r") as file:
         with console.status("Processing..."):
             config = yaml.safe_load(file)
-            print("[green]Config loaded!")
+            try:
+                config_schema.validate(config)
+                print("[green]Config loaded!")
+            except SchemaError as e:
+                print("[red]Failed to validate config.yaml. Error:")
+                print(e)
+                sys.exit(1)
 
 
 def getDNACDevices(dnac: api.DNACenterAPI) -> dict:
